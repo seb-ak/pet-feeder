@@ -1,0 +1,127 @@
+from flask import Flask, Response, request, abort, jsonify, send_file, render_template_string, stream_with_context, session, redirect, url_for
+from flask_cors import CORS
+import atexit
+import cv2
+import threading
+import time
+import datetime
+import logging
+
+class Camera:
+    def __init__(self, config):
+        self.config = config
+        self.device = config["CAPTURE_DEVICE"]
+        self.width = config["FRAME_WIDTH"]
+        self.height = config["FRAME_HEIGHT"]
+        self.cap = None
+        self.clients = 0
+        self.clients_lock = threading.Lock()
+
+    def open(self):
+        if self.cap is None or not self.cap.isOpened():
+            logging.info("Opening camera")
+            self.cap = cv2.VideoCapture(self.device)
+            self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, self.width)
+            self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, self.height)
+
+    def close(self):
+        if self.cap is not None and self.cap.isOpened():
+            logging.info("Closing camera")
+            self.cap.release()
+        self.cap = None
+
+    def generate_mjpeg(self):
+        with self.clients_lock:
+            self.clients += 1
+            if self.clients == 1:
+                self.open()
+        try:
+            last = time.time()
+            while True:
+                if self.cap is None or not self.cap.isOpened():
+                    break
+                now = time.time()
+                if now - last < self.config["FRAME_DELAY"]:
+                    time.sleep(self.config["FRAME_DELAY"] - (now - last))
+                success, frame = self.cap.read()
+                if not success:
+                    continue
+                ts = datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+                cv2.putText(frame, ts, (10, 30),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.8,
+                            (255, 255, 255), 2, cv2.LINE_AA)
+                ok, buf = cv2.imencode(".jpg", frame)
+                if not ok:
+                    continue
+                yield (b"--frame\r\n"
+                    b"Content-Type: image/jpeg\r\n\r\n" +
+                    buf.tobytes() +
+                    b"\r\n")
+                last = time.time()
+        finally:
+            with self.clients_lock:
+                self.clients -= 1
+                if self.clients == 0:
+                    self.close()
+
+class PetFeederServer:
+    def __init__(self, config):
+        self.camera = Camera(config)
+        self.config = config
+
+        self.app = Flask(__name__)
+        self.app.secret_key = config["SECRET_KEY"]
+        CORS(self.app, resources={r"/*": {"origins": "*"}})
+
+        self._register_routes()
+
+        atexit.register(self.shutdown)
+
+    def _register_routes(self):
+        app = self.app
+        config = self.config
+
+        @app.after_request
+        def allow_all(response):
+            response.headers["Access-Control-Allow-Origin"] = "*"
+            return response
+
+        def is_logged_in():
+            return session.get("logged_in", False)
+
+        @app.route("/login", methods=["GET", "POST"])
+        def login():
+            if request.method == "POST":
+                pw = request.form.get("pw")
+                if pw == config["EXPECTED_PASSWORD"]:
+                    session["logged_in"] = True
+                    return redirect(url_for("dashboard"))
+                else:
+                    return render_template_string(config["LOGIN_HTML"] + "<p style='color:red'>Wrong password</p>")
+            return render_template_string(config["LOGIN_HTML"])
+
+        @app.route("/logout")
+        def logout():
+            session.clear()
+            return redirect(url_for("login"))
+
+        @app.route("/")
+        def dashboard():
+            if not is_logged_in():
+                return redirect(url_for("login"))
+            return render_template_string(config["DASHBOARD_HTML"])
+
+        @app.route("/video_feed")
+        def video_feed():
+            if not is_logged_in():
+                abort(403)
+            return Response(
+                stream_with_context(self.camera.generate_mjpeg()),
+                mimetype="multipart/x-mixed-replace; boundary=frame"
+            )
+
+    def shutdown(self):
+        self.camera.close()
+
+    def run(self, host="0.0.0.0", port=8080):
+        self.app.run(host=host, port=port, threaded=True)
