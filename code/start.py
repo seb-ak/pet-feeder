@@ -5,8 +5,8 @@ import os
 
 CONFIG = {
     "CAPTURE_DEVICE": 0,
-    "FRAME_WIDTH": 1280,
-    "FRAME_HEIGHT": 720,
+    "FRAME_WIDTH": 1280 * 0.5,
+    "FRAME_HEIGHT": 720 * 0.5,
     "FRAME_DELAY": 1/30,
     "EXPECTED_PASSWORD": os.getenv("feeder_password", "password"),
 
