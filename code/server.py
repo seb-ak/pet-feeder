@@ -46,10 +46,10 @@ class Camera:
                 success, frame = self.cap.read()
                 if not success:
                     continue
-                ts = datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")
-                cv2.putText(frame, ts, (10, 30),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.8,
-                            (255, 255, 255), 2, cv2.LINE_AA)
+                ts = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+                cv2.putText(frame, ts, (10, 20),
+                            cv2.FONT_HERSHEY_PLAIN, 1,
+                            (255, 255, 255), 1, cv2.LINE_AA)
                 ok, buf = cv2.imencode(".jpg", frame)
                 if not ok:
                     continue
@@ -97,7 +97,10 @@ class PetFeederServer:
                     session["logged_in"] = True
                     return redirect(url_for("dashboard"))
                 else:
-                    return render_template_string(config["LOGIN_HTML"] + "<p style='color:red'>Wrong password</p>")
+                    return render_template_string(
+                        config["LOGIN_HTML"]
+                        .replace("<p>Enter the password to access.</p>", "<p>Incorrect password. Please try again.</p>")
+                    )
             return render_template_string(config["LOGIN_HTML"])
 
         @app.route("/logout")
@@ -119,9 +122,29 @@ class PetFeederServer:
                 stream_with_context(self.camera.generate_mjpeg()),
                 mimetype="multipart/x-mixed-replace; boundary=frame"
             )
+        
+        @app.route("/cmd")
+        def cmd():
+            if not is_logged_in():
+                return redirect(url_for("login"))
+            c = request.args.get("c")
+            if c == "feed":
+                feed()
+                return redirect(url_for("dashboard"))
+            elif c == "reboot":
+                # TODO: Implement reboot logic here
+                print("Reboot triggered!")
+                return redirect(url_for("dashboard"))
+            elif c == "logout":
+                return redirect(url_for("logout"))
+            else:
+                abort(400, description="Unknown command")
 
     def shutdown(self):
         self.camera.close()
 
     def run(self, host="0.0.0.0", port=8080):
         self.app.run(host=host, port=port, threaded=True)
+
+def feed():
+    print("Feeding triggered!")

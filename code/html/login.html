@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <link rel="icon" href="icon.png" type="image/png">
-    <title>Seb-ak -Login</title>
+    <link rel="icon" href="code/icon.png" type="image/png">
+    <title>Rabbit Feeder - login</title>
 
     <style>
         * {
@@ -21,7 +21,6 @@
             text-align: center;
             margin-top: 50px;
         }
-
 
         form input, form button {
             width: 30vw;
@@ -52,7 +51,7 @@
             color: white;
         }
 
-        form {
+        form, h1, p {
             background: #1f1b22ff;
             display: flex;
             flex-direction: row;
@@ -60,18 +59,42 @@
             padding: 5vw;
 
             border: #1e2949ff solid 1vw;
-            border-radius: 3vw;;
+            border-radius: 1vw;
+            width: 50vw;
+            margin: 0;
+        }
+
+        h1 {
+            flex-direction: column;
+            border-color: #1e4942ff;
+            margin-bottom: 1vw;
+            padding-top: 2vw;
+            padding-bottom: 2vw;
+        }
+
+        p {
+            flex-direction: column;
+            border-color: #49321eff;
+            margin-top: 1vw;
+            padding-top: 2vw;
+            padding-bottom: 2vw;
+            font-size: 2vw;
         }
 
 
     </style>
 
 </head>
+<body>
 
-<form method="post" action="/login">
-    <input type="password" name="pw" placeholder="Password"/>
-    <button type="submit">Login</button>
-</form>
+    <h1>Rabbit Feeder Login</h1>
 
+    <form method="post" action="/login">
+        <input type="password" name="pw" placeholder="Password"/>
+        <button type="submit">Login</button>
+    </form>
+
+    <p>Enter the password to access.</p>
+    
 </body>
 </html>
