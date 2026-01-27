@@ -15,7 +15,7 @@ CONFIG = {
     "DASHBOARD_HTML": open("code/html/dashboard.html").read(),
 }
 
+subprocess.Popen(["cloudflared", "tunnel", "run", "rabbits"])
+
 server = PetFeederServer(CONFIG)
 server.run()
-
-subprocess.Popen(["cloudflared", "tunnel", "run", "rabbits"])
