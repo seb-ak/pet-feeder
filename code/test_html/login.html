@@ -1,6 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" href="icon.png" type="image/png">
+    <title>Seb-ak -Login</title>
 
+    <style>
+        * {
+            font-family: 'Courier New', Courier, monospace;
+            color: #bcbfc2ff;
+        }
+        body {
+            background: #02091aff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+
+        form input, form button {
+            width: 30vw;
+            padding: 1.2vw 1.6vw;
+            margin: 1vw 0;
+            font-size: 4vw;
+            border-radius: 0.6vw;
+            border: none;
+            box-sizing: border-box;
+            margin: 1vw;
+        }
+
+        form input {
+            background: rgb(16, 14, 17);
+            color: #eee;
+            outline: none;
+        }
+
+        form button {
+            background: rgb(64, 57, 70);
+            cursor: pointer;
+            width: auto;
+            height: 7vw;
+        }
+
+        form button:hover {
+            background: rgb(93, 82, 104);
+            color: white;
+        }
+
+        form {
+            background: #1f1b22ff;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            padding: 5vw;
+
+            border: #1e2949ff solid 1vw;
+            border-radius: 3vw;;
+        }
+
+
+    </style>
+
+</head>
 
 <form method="post" action="/login">
     <input type="password" name="pw" placeholder="Password"/>
     <button type="submit">Login</button>
 </form>
+
+</body>
+</html>
