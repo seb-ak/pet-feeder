@@ -6,6 +6,7 @@ import threading
 import time
 import datetime
 import logging
+import subprocess
 
 class Camera:
     def __init__(self, config):
@@ -132,8 +133,7 @@ class PetFeederServer:
                 feed()
                 return redirect(url_for("dashboard"))
             elif c == "reboot":
-                # TODO: Implement reboot logic here
-                print("Reboot triggered!")
+                reboot()
                 return redirect(url_for("dashboard"))
             elif c == "logout":
                 return redirect(url_for("logout"))
@@ -148,3 +148,6 @@ class PetFeederServer:
 
 def feed():
     print("Feeding triggered!")
+
+def reboot():
+    subprocess.run(["sudo", "reboot"])
