@@ -1,14 +1,17 @@
+feedTimeSeconds = 2
+frameRate = 20
+videoWidth = 1280 * 0.5
+videoHeight = 720 * 0.5
+title = "Rabbit Feeder"
+
+
 import secrets
 from server import PetFeederServer 
 import subprocess
 import os
 
-title = "Rabbit Feeder"
-videoWidth = 1280 * 0.5
-videoHeight = 720 * 0.5
-frameRate = 20
-
 CONFIG = {
+    "FEED_TIME_SECONDS": feedTimeSeconds,
     "TITLE": title,
     "EXPECTED_PASSWORD": os.getenv("feeder_password", "password"),
     "FRAME_WIDTH": videoWidth,

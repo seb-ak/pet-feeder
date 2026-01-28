@@ -129,14 +129,18 @@ class PetFeederServer:
             if not is_logged_in():
                 return redirect(url_for("login"))
             c = request.args.get("c")
+
             if c == "feed":
-                feed()
+                feed(config["FEED_TIME_SECONDS"])
                 return redirect(url_for("dashboard"))
+            
             elif c == "reboot":
                 reboot()
                 return redirect(url_for("dashboard"))
+            
             elif c == "logout":
                 return redirect(url_for("logout"))
+            
             else:
                 abort(400, description="Unknown command")
 
@@ -146,8 +150,24 @@ class PetFeederServer:
     def run(self, host="0.0.0.0", port=8080):
         self.app.run(host=host, port=port, threaded=True)
 
-def feed():
-    print("Feeding triggered!")
+import RPi.GPIO as GPIO
+def feed(time_seconds):
+    def feed_thread(time_seconds):
+        IN1 = 23
 
-def reboot():
-    subprocess.run(["sudo", "reboot"])
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(IN1, GPIO.OUT)
+        time.sleep(0.5)
+
+        try:
+            GPIO.output(IN1, GPIO.HIGH)
+            time.sleep(time_seconds)
+            GPIO.output(IN1, GPIO.LOW)
+
+        finally:
+            time.sleep(0.5)
+            GPIO.cleanup()
+
+    threading.Thread(target=feed_thread, args=(time_seconds,)).start()
+
+def reboot(): subprocess.run(["sudo", "reboot"])
