@@ -58,8 +58,18 @@
             margin-top: 1vw;
             margin-bottom: 1vw;
 
-            width: 96vw;
             height: calc(96vw * 9/16);
+        }
+
+        #fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 9999;
+            object-fit: contain;
+            background: black;
         }
 
         #bottom {
@@ -78,7 +88,11 @@
 
     </div>
 
-    <img class="container" id="middle" src="/video_feed" alt="Loading Camera">
+    <img
+        class="container" id="middle"
+        src="/video_feed" alt="Loading Camera"
+        onclick="toggleFullscreen()"
+    >
 
     <div class="container" id="bottom">
 
@@ -87,6 +101,13 @@
         <button onclick="location.href='/cmd?c=logout'">Logout</button>
 
     </div>
-
 </body>
+<script>
+    function toggleFullscreen() {
+        const img = document.getElementById("middle") || document.getElementById("fullscreen");
+        if (!img) return;
+
+        img.id = img.id === "middle" ? "fullscreen" : "middle";
+    }
+</script>
 </html>
