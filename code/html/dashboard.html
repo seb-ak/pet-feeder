@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link rel="icon" href="code/icon.png" type="image/png">
-    <title>Rabbit Feeder - dashboard</title>
+    <title>*title* - dashboard</title>
 
     <style>
         * {
@@ -70,6 +70,7 @@
             z-index: 9999;
             object-fit: contain;
             background: black;
+            border-width: 0;
         }
 
         #bottom {
@@ -83,30 +84,22 @@
 <body>
 
     <div class="container" id="top">
-
-        <h1>Rabbit Feeder</h1>
-
+        <h1>*title*</h1>
     </div>
 
-    <img
-        class="container" id="middle"
-        src="/video_feed" alt="Loading Camera"
-        onclick="toggleFullscreen()"
-    >
+    <img class="container" id="middle" src="/video_feed" alt="Loading Camera" onclick="toggleFullscreen()">
 
     <div class="container" id="bottom">
-
         <button onclick="location.href='/cmd?c=feed'">Feed</button>
         <button onclick="location.href='/cmd?c=reboot'">Reboot</button>
         <button onclick="location.href='/cmd?c=logout'">Logout</button>
-
     </div>
+
 </body>
 <script>
     function toggleFullscreen() {
         const img = document.getElementById("middle") || document.getElementById("fullscreen");
         if (!img) return;
-
         img.id = img.id === "middle" ? "fullscreen" : "middle";
     }
 </script>
