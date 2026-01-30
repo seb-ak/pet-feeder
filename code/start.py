@@ -6,7 +6,6 @@ title = "Rabbit Feeder"
 
 import secrets
 from server import PetFeederServer 
-import subprocess
 import os
 
 CONFIG = {
