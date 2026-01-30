@@ -4,7 +4,6 @@ videoWidth = 1280 * 0.5
 videoHeight = 720 * 0.5
 title = "Rabbit Feeder"
 
-
 import secrets
 from server import PetFeederServer 
 import subprocess
@@ -22,8 +21,6 @@ CONFIG = {
     "LOGIN_HTML": open("code/html/login.html").read().replace("*title*", title),
     "DASHBOARD_HTML": open("code/html/dashboard.html").read().replace("*title*", title),
 }
-
-subprocess.Popen(["cloudflared", "tunnel", "run", "rabbits"])
 
 server = PetFeederServer(CONFIG)
 server.run()
