@@ -143,6 +143,7 @@ class PetFeederServer:
         def cmd():
             if not is_logged_in():
                 return redirect(url_for("login"))
+            
             if is_temp():
                 return redirect(url_for("dashboard"))
 
@@ -160,7 +161,7 @@ class PetFeederServer:
                 return redirect(url_for("logout"))
             
             elif c == "link":
-                code = secrets.token_urlsafe(5),
+                code = secrets.token_urlsafe(5)
                 self.tempCodes.append(code)
                 link = "https://rabbits.sebak.me.uk/?c=" + code
                 return redirect(
