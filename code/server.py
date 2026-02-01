@@ -124,13 +124,13 @@ class PetFeederServer:
 
             if not is_logged_in():
                 if is_temp():
-                    return render_template_string(config["DASHBOARD_HTML"].replace("#bottom {","#bottom { visibility: hidden;"))
+                    return render_template_string(config["DASHBOARD_HTML"].replace("#bottom {","#bottom { visibility: hidden;").replace('id="show1"','id="hide1"').replace('id="show2"','id="hide2"'))
                 
                 return redirect(url_for("login"))
             
             url = session.get("code_url", False)
             if url != False:
-                return render_template_string(config["DASHBOARD_HTML"]).replace('id="show1"','id="hide1"').replace('id="hide2"','id="show2"').replace("*link*",url)
+                return render_template_string(config["DASHBOARD_HTML"].replace('id="show1"','id="hide1"').replace('id="hide2"','id="show2"').replace("*link*",url))
 
             return render_template_string(config["DASHBOARD_HTML"])
 
