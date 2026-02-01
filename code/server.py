@@ -128,9 +128,9 @@ class PetFeederServer:
                 
                 return redirect(url_for("login"))
             
-            url = session.get("url", False)
+            url = session.get("code_url", False)
             if url != False:
-                return render_template_string(config["DASHBOARD_HTML"]).replace("show1","hide1").replace("hide2","show2").replace("*link*",url)
+                return render_template_string(config["DASHBOARD_HTML"]).replace('id="show1"','id="hide1"').replace('id="hide2"','id="show2"').replace("*link*",url)
 
             return render_template_string(config["DASHBOARD_HTML"])
 
@@ -168,7 +168,7 @@ class PetFeederServer:
                 code = secrets.token_urlsafe(5)
                 self.tempCodes.append(code)
                 link = "https://rabbits.sebak.me.uk/?c=" + code
-                session["url"] = link
+                session["code_url"] = link
                 return redirect(url_for("dashboard"))
             
             else:
