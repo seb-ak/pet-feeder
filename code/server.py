@@ -128,6 +128,10 @@ class PetFeederServer:
                 
                 return redirect(url_for("login"))
             
+            url = session.get("url", False)
+            if url != False:
+                return render_template_string(config["DASHBOARD_HTML"]).replace("show1","hide1").replace("hide2","show2").replace("*link*",url)
+
             return render_template_string(config["DASHBOARD_HTML"])
 
         @app.route("/video_feed")
@@ -164,9 +168,8 @@ class PetFeederServer:
                 code = secrets.token_urlsafe(5)
                 self.tempCodes.append(code)
                 link = "https://rabbits.sebak.me.uk/?c=" + code
-                return redirect(
-                    url_for("dashboard").replace("show1","hide1").replace("hide2","show2").replace("*link*",link)
-                )
+                session["url"] = link
+                return redirect(url_for("dashboard"))
             
             else:
                 abort(400, description="Unknown command")
