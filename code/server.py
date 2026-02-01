@@ -7,6 +7,7 @@ import time
 import datetime
 import logging
 import subprocess
+import secrets
 
 class Camera:
     def __init__(self, config):
@@ -69,6 +70,7 @@ class PetFeederServer:
     def __init__(self, config):
         self.camera = Camera(config)
         self.config = config
+        self.tempCodes = []
 
         self.app = Flask(__name__)
         self.app.secret_key = config["SECRET_KEY"]
@@ -89,6 +91,9 @@ class PetFeederServer:
 
         def is_logged_in():
             return session.get("logged_in", False)
+        
+        def is_temp():
+            return session.get("temp", False)
 
         @app.route("/login", methods=["GET", "POST"])
         def login():
@@ -111,13 +116,23 @@ class PetFeederServer:
 
         @app.route("/")
         def dashboard():
+            c = request.args.get("c")
+            if c in self.tempCodes:
+                session["temp"] = True
+                index = self.tempCodes.index(c)
+                self.tempCodes.pop(index)
+
             if not is_logged_in():
+                if is_temp():
+                    return render_template_string(config["DASHBOARD_HTML"].replace("#bottom {","#bottom { visibility: hidden;"))
+                
                 return redirect(url_for("login"))
+            
             return render_template_string(config["DASHBOARD_HTML"])
 
         @app.route("/video_feed")
         def video_feed():
-            if not is_logged_in():
+            if not is_logged_in() and not is_temp():
                 abort(403)
             return Response(
                 stream_with_context(self.camera.generate_mjpeg()),
@@ -128,6 +143,9 @@ class PetFeederServer:
         def cmd():
             if not is_logged_in():
                 return redirect(url_for("login"))
+            if is_temp():
+                return redirect(url_for("dashboard"))
+
             c = request.args.get("c")
 
             if c == "feed":
@@ -140,6 +158,14 @@ class PetFeederServer:
             
             elif c == "logout":
                 return redirect(url_for("logout"))
+            
+            elif c == "link":
+                code = secrets.token_urlsafe(5),
+                self.tempCodes.append(code)
+                link = "https://rabbits.sebak.me.uk/?c=" + code
+                return redirect(
+                    url_for("dashboard").replace("show1","hide1").replace("hide2","show2").replace("*link*",link)
+                )
             
             else:
                 abort(400, description="Unknown command")

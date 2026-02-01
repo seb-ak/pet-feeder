@@ -75,10 +75,36 @@
         }
 
         #bottom {
-            flex-direction: row;
+            flex-direction: column;
             border-color: #49321eff;
         }
+
+        #row {
+            display: flex;
+            align-items: start;
+            flex-direction: row;
+        }
+
+        #hide1, #hide2 {position: absolute; visibility: hidden;}
         
+        .link {
+            width: fit-content;
+            padding: 0;
+            
+            font-size: 6vw;
+            border-radius: 0.6vw;
+            border: none;
+            box-sizing: border-box;
+            border: rgb(64, 57, 70) solid 1vw;
+            margin: 0;
+        }
+
+        a {
+            user-select: text;
+            padding: 0;
+            margin: 0;
+        }
+
     </style>
 
 </head>
@@ -91,9 +117,20 @@
     <img class="container" id="middle" src="/video_feed" alt="Loading Camera" onclick="toggleFullscreen()">
 
     <div class="container" id="bottom">
-        <button onclick="location.href='/cmd?c=feed'">Feed</button>
-        <button onclick="location.href='/cmd?c=reboot'">Reboot</button>
-        <button onclick="location.href='/cmd?c=logout'">Logout</button>
+        <div class="row">
+            <button onclick="location.href='/cmd?c=feed'">Feed</button>
+        </div>
+        <div class="row">
+            <button onclick="location.href='/cmd?c=link'" id="show1">Create temporary link</button>
+            <div class="link" id="hide2">
+                <a id="url">*link*</a>
+                <button onclick="copyLink()" style="margin: 0; border-radius: 0;">Copy</button>
+            </div>
+        </div>
+        <div class="row">
+            <button onclick="location.href='/cmd?c=reboot'">Reboot</button>
+            <button onclick="location.href='/cmd?c=logout'">Logout</button>
+        </div>
     </div>
 
 </body>
@@ -102,6 +139,29 @@
         const img = document.getElementById("middle") || document.getElementById("fullscreen");
         if (!img) return;
         img.id = img.id === "middle" ? "fullscreen" : "middle";
+    }
+    function copyLink() {
+        const link = document.getElementById("url").innerText;
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(link).then(function() {
+                alert("Link copied to clipboard!");
+            }, function(err) {
+                alert("Failed to copy link: " + err);
+            });
+        } else {
+            // Fallback for older browsers
+            const textarea = document.createElement("textarea");
+            textarea.value = link;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand("copy");
+                alert("Link copied to clipboard!");
+            } catch (err) {
+                alert("Failed to copy link: " + err);
+            }
+            document.body.removeChild(textarea);
+        }
     }
 </script>
 </html>
