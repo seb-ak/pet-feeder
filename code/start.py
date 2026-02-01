@@ -1,7 +1,7 @@
 feedTimeSeconds = 2
-frameRate = 20
-videoWidth = 1280 * 0.5
-videoHeight = 720 * 0.5
+frameRate = 15
+videoWidth = 1280 * 1
+videoHeight = 720 * 1
 title = "Rabbit Feeder"
 
 import secrets
