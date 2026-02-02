@@ -139,7 +139,14 @@
     function toggleFullscreen() {
         const img = document.getElementById("middle") || document.getElementById("fullscreen");
         if (!img) return;
-        img.id = img.id === "middle" ? "fullscreen" : "middle";
+
+        if (!document.fullscreenElement) {
+            img.requestFullscreen();
+            img.id = "fullscreen";
+        } else {
+            document.exitFullscreen();
+            img.id = "middle";
+        }
     }
     function copyLink() {
         const link = document.getElementById("url").innerText;
