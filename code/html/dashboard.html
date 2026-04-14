@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="code/icon.png" type="image/png">
     <title>*title* - dashboard</title>
 
@@ -111,23 +111,23 @@
 </head>
 <body>
 
+    <img class="container" id="middle" src="/video_feed" alt="Loading Camera" onclick="toggleFullscreen()">
+
     <div class="container" id="top">
         <h1>*title*</h1>
     </div>
-
-    <img class="container" id="middle" src="/video_feed" alt="Loading Camera" onclick="toggleFullscreen()">
-
+    
     <div class="container" id="bottom">
         <div class="row">
             <button onclick="location.href='/cmd?c=feed'">Feed</button>
         </div>
-        <div class="row">
+        <!-- <div class="row">
             <button onclick="location.href='/cmd?c=link'" id="show1">Create temporary link</button>
             <div class="link" id="hide2">
                 <a id="url">*link*</a>
                 <button onclick="copyLink()" style="margin: 0; border-radius: 0;">Copy</button>
             </div>
-        </div>
+        </div> -->
         <div class="row">
             <button onclick="location.href='/cmd?c=reboot'">Reboot</button>
             <button onclick="location.href='/cmd?c=logout'">Logout</button>
