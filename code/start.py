@@ -17,8 +17,8 @@ CONFIG = {
     "FRAME_DELAY": 1/frameRate,
     "CAPTURE_DEVICE": 0,
     "SECRET_KEY": secrets.token_urlsafe(32),
-    "LOGIN_HTML": open("code/html/login.html").read().replace("*title*", title),
-    "DASHBOARD_HTML": open("code/html/dashboard.html").read().replace("*title*", title),
+    "LOGIN_HTML": open("code/html/login.html").read(),
+    "DASHBOARD_HTML": open("code/html/dashboard.html").read(),
 }
 
 server = PetFeederServer(CONFIG)

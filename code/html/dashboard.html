@@ -4,106 +4,212 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="code/icon.png" type="image/png">
-    <title>*title* - dashboard</title>
+    <title>dashboard</title>
 
     <style>
         * {
             font-family: 'Courier New', Courier, monospace;
             color: #bcbfc2ff;
+            -webkit-user-select: none;
             user-select: none;
         }
         body {
-            background: #02091aff;
+            background-color: black;
+        }
+
+        #video {
+            /* background-color: rgba(255, 255, 255, 0.144);
+            border: white solid 1px;
+            box-sizing: border-box; */
+
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            
+            aspect-ratio: 16 / 9;
+            width: min(100vw, calc(100vh * 16/9));
+            height: auto;
+            max-width: none;
+            max-height: none;
+
+            transform: translate(-50%, -50%);
+            overflow: hidden;
+        }
+
+        #video img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .feed-status {
+            position: absolute;
+            inset: 0;
             display: flex;
-            justify-content: center;
             align-items: center;
-            flex-direction: column;
+            justify-content: center;
+            text-align: center;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.75);
+            color: white;
+            font-size: clamp(1rem, 2.2vw, 1.5rem);
+            font-weight: bold;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+            z-index: 2;
+        }
+
+        .feed-status.visible {
+            opacity: 1;
+        }
+
+        @media (max-aspect-ratio: 1/1) {
+            #video {
+                width: auto;
+                height: min(100vw, calc(100vh * 9/16));
+
+                transform: translate(-50%, -50%) rotate(90deg);
+                transform-origin: center center;
+            }
+        }
+
+
+
+
+        
+        .side#list, .side#expand {
+            position: relative;
+            box-sizing: border-box;
+            
+            border: rgba(194, 224, 236, 0.5) solid 0.2rem;
+            background-color: rgba(81, 85, 87, 0.6);
+        }
+
+        .side#expand {
+
+            bottom: 0;
+
+            width: 1.5rem;
+            height: 2rem;
+
+            opacity: 0.2;
+            
+            border-right: none;
+            border-top-left-radius: 2rem;
+            border-bottom-left-radius: 2rem;
+
+            align-content: center;
             text-align: center;
         }
 
-        button {
-            padding: 1.2vw 1.6vw;
-            font-size: 6vw;
-            border-radius: 0.6vw;
-            border: none;
-            margin: 1vw;
-            box-sizing: border-box;
-            background: rgb(64, 57, 70);
-            cursor: pointer;
+        .side#expand:hover {
+            opacity: 0.3;
         }
 
-        button:hover {
-            background: rgb(93, 82, 104);
-            color: white;
+        #spinner {
+            font-weight: bolder;
+            color: rgba(187, 209, 208, 0.5);
+
+            transition-timing-function: linear(0, -0.001 4.9%, -0.007 8.3%, -0.02 11.4%, -0.04 14.3%, -0.07 17.2%, -0.11 20.2%, -0.158 23.1%, -0.267 29.2%, -0.309 32.1%, -0.325 33.7%, -0.333 35.2%, -0.332 36.5%, -0.324 37.8%, -0.311 38.8%, -0.293 39.7%, -0.27 40.6%, -0.241 41.5%, -0.164 43.2%, -0.065 44.8%, 0.057 46.3%, 0.198 47.7%, 0.358 49%, 0.719 51.6%, 0.856 52.8%, 0.97 54%, 1.086 55.5%, 1.18 57.1%, 1.248 58.7%, 1.276 59.6%, 1.298 60.5%, 1.319 61.8%, 1.327 62.5%, 1.331 63.2%, 1.333 63.9%, 1.333 64.6%, 1.331 65.4%, 1.326 66.2%, 1.308 68%, 1.278 70.1%, 1.154 77.1%, 1.107 80%, 1.075 82.4%, 1.048 84.8%, 1.035 86.3%, 1.024 87.9%, 1.015 89.5%, 1.009 91.2%, 1.002 94.8%, 1);
+            transition-duration: 1s;
+            transition-property: rotate;
+            transition-behavior: inherit;
+
+            rotate: 0deg;
         }
 
-        .container {
-            width: 96vw;
-
-            background: #1f1b22ff;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-
-            border: #1e2949ff solid 1vw;
-            border-radius: 1vw;
-        }
-
-        #top {
-            border-color: #1e4942ff;
-            font-size: 5vw;
-        }
-
-        #middle {
-            margin-top: 1vw;
-            margin-bottom: 1vw;
-
-            height: calc(96vw * 9/16);
-        }
-
-        #fullscreen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: 9999;
-            object-fit: contain;
-            background: black;
-            border-width: 0;
-            border-radius: 0;
-        }
-
-        #bottom {
-            flex-direction: column;
-            border-color: #49321eff;
-        }
-
-        #row {
-            display: flex;
-            align-items: start;
-            flex-direction: row;
-        }
-
-        #hide1, #hide2 {position: absolute; visibility: hidden;}
-        #show1, #show2 {position: relative; visibility: visible;}
-        
-        .link {
-            width: fit-content;
-            padding: 0;
+        .side#container {
             
-            font-size: 6vw;
-            border-radius: 0.6vw;
-            border: none;
-            box-sizing: border-box;
-            border: rgb(64, 57, 70) solid 1vw;
-            margin: 0;
+            position: fixed;
+
+            top: 5vh;
+            left: calc(100vw - 1.5rem);
+
+            height: 90vh;
+            display: flex;
+
+            transition-duration: 0.4s;
+            /* transition-timing-function: linear(0, 0.162 5.1%, 0.329 11.1%, 0.845 31%, 0.934 34.7%, 1 37.8%, 0.945 40.9%, 0.924 42.4%, 0.906 43.9%, 0.892 45.4%, 0.883 46.8%, 0.877 48.2%, 0.875 49.7%, 0.876 51%, 0.88 52.3%, 0.888 53.7%, 0.898 55.1%, 0.918 57.4%, 0.978 63.1%, 1 65.5%, 0.986 67.4%, 0.976 69.2%, 0.971 71%, 0.969 72.9%, 0.97 74.5%, 0.974 76.3%, 0.994 82.2%, 1 84.5%, 0.996 86.8%, 0.995 89.2%, 1); */
+            transition-timing-function: linear(0, 0.092 4.7%, 0.189 9.9%, 0.495 27.3%, 0.806 44.6%, 0.87 48.4%, 0.921 51.7%, 0.965 54.8%, 1 57.7%, 0.964 61.4%, 0.941 64.8%, 0.933 66.5%, 0.927 68.3%, 0.923 70%, 0.922 71.8%, 0.925 74.7%, 0.933 77.8%, 0.944 80.7%, 0.977 87.9%, 0.99 91.8%, 0.998 95.7%, 1);
+            transition-property: left right;
         }
 
-        a {
-            user-select: text;
+
+        
+
+        .side#list {
+
+            font-size: 10vh;
+
+            display: flex;
+            flex-direction: column;
+
+            opacity: 0.2;
+
+            width: calc(14rem);
+            padding: 1rem;
+            gap: 0.25rem;
+
+            border-right: none;
+            border-bottom-left-radius: 2rem;
+
+        }
+
+        .side#list button {
+            color: white;
+            background-color: transparent;
+            width: 12rem;
+            border: 0.2rem whitesmoke solid;
+        }
+
+        .side#list button:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .side#list button:first-child {
+            border-top-left-radius: 0.5rem;
+            border-top-right-radius: 0.5rem;
+        }
+
+        .side#list button:last-child {
+            border-bottom-left-radius: 0.5rem;
+            border-bottom-right-radius: 0.5rem;
+        }
+
+        .side#list hr {
+            color: white;
+            opacity: 0.6;
+            width: 12rem;
+            border: 0.15rem whitesmoke solid;
             padding: 0;
             margin: 0;
+            box-sizing: border-box;
+        }
+
+        .side#list span {
+            height: 2000vh;
+        }
+
+        @keyframes loadSpin {
+            0% {transform: translate(-50%, -50%) rotate(0deg);}
+            100% {transform: translate(-50%, -50%) rotate(-360deg);}
+        }
+
+        #loading {
+            position: absolute;
+            top: 50vh;
+            left: 50vw;
+            transform: translate(-50%, -50%);
+            width: 10vmin;
+            height: 10vmin;
+            background-image: conic-gradient(rgba(177, 204, 204, 0.4), rgba(177, 204, 204, 0.1) 85%);
+            border-radius: 50%;
+
+            animation: loadSpin 1s linear infinite;
         }
 
     </style>
@@ -111,65 +217,84 @@
 </head>
 <body>
 
-    <img class="container" id="middle" src="/video_feed" alt="Loading Camera" onclick="toggleFullscreen()">
 
-    <div class="container" id="top">
-        <h1>*title*</h1>
+    <div id="video">
+        <img src="/video_feed" alt="Video feed" onerror="this.style.display='none'">
     </div>
     
-    <div class="container" id="bottom">
-        <div class="row">
+
+    <div id="loading"></div>
+
+
+    <div class="side" id="container">
+
+        <div class="side" id="expand" onclick="toggleSide()">
+            <div id="spinner"><</div>
+        </div>
+
+        <div class="side" id="list">
+            <button onclick="toggleFullscreen()">Fullscreen</button>
+            <hr>
             <button onclick="location.href='/cmd?c=feed'">Feed</button>
-        </div>
-        <!-- <div class="row">
-            <button onclick="location.href='/cmd?c=link'" id="show1">Create temporary link</button>
-            <div class="link" id="hide2">
-                <a id="url">*link*</a>
-                <button onclick="copyLink()" style="margin: 0; border-radius: 0;">Copy</button>
-            </div>
-        </div> -->
-        <div class="row">
-            <button onclick="location.href='/cmd?c=reboot'">Reboot</button>
+
+            <span></span>
+
             <button onclick="location.href='/cmd?c=logout'">Logout</button>
+            <button onclick="location.href='/cmd?c=reboot'">Reboot</button>
         </div>
+
     </div>
 
+    
 </body>
 <script>
     function toggleFullscreen() {
-        const img = document.getElementById("middle") || document.getElementById("fullscreen");
-        if (!img) return;
-
-        if (!document.fullscreenElement) {
-            img.requestFullscreen();
-            img.id = "fullscreen";
-        } else {
+        if (document.fullscreenElement) {
             document.exitFullscreen();
-            img.id = "middle";
+        }
+        else {
+            document.body.requestFullscreen();
         }
     }
-    function copyLink() {
-        const link = document.getElementById("url").innerText;
-        if (navigator.clipboard) {
-            navigator.clipboard.writeText(link).then(function() {
-                alert("Link copied to clipboard!");
-            }, function(err) {
-                alert("Failed to copy link: " + err);
-            });
+
+    let sideOpen = false;
+    function toggleSide() {
+        if (!sideOpen) {
+            document.getElementById("spinner").style.rotate = "-180deg"
+            document.getElementById("container").style.left = "calc(100vw - 1.5rem - 14rem)"
         } else {
-            // Fallback for older browsers
-            const textarea = document.createElement("textarea");
-            textarea.value = link;
-            document.body.appendChild(textarea);
-            textarea.select();
-            try {
-                document.execCommand("copy");
-                alert("Link copied to clipboard!");
-            } catch (err) {
-                alert("Failed to copy link: " + err);
-            }
-            document.body.removeChild(textarea);
+            
+            document.getElementById("spinner").style.rotate = "0deg"
+            document.getElementById("container").style.left = "calc(100vw - 1.5rem)"
         }
+        sideOpen = !sideOpen
     }
+
+    {
+        const video = document.querySelector("#video img");
+        const loading = document.getElementById("loading");
+        let lastFrameTime = 0;
+
+        function frameRecieve() {
+            lastFrameTime = Date.now();
+            loading.style.visibility = "hidden"
+        }
+
+        function frameError() {
+            loading.style.visibility = "visible"
+        }
+
+        function checkVideo() {
+            if (Date.now() - lastFrameTime > 1000) {
+                loading.style.visibility = "visible"
+            }
+        }
+
+        video.addEventListener("load", frameRecieve);
+        video.addEventListener("error", frameError);
+
+        setInterval(checkVideo, 1000);
+    }
+
 </script>
 </html>

@@ -8,7 +8,7 @@ import datetime
 import logging
 import subprocess
 import secrets
-
+    
 class Camera:
     def __init__(self, config):
         self.config = config
@@ -70,7 +70,6 @@ class PetFeederServer:
     def __init__(self, config):
         self.camera = Camera(config)
         self.config = config
-        self.tempCodes = []
 
         self.app = Flask(__name__)
         self.app.secret_key = config["SECRET_KEY"]
@@ -92,21 +91,21 @@ class PetFeederServer:
         def is_logged_in():
             return session.get("logged_in", False)
         
-        def is_temp():
-            return session.get("temp", False)
-
         @app.route("/login", methods=["GET", "POST"])
         def login():
             if request.method == "POST":
                 pw = request.form.get("pw")
+
                 if pw == config["EXPECTED_PASSWORD"]:
                     session["logged_in"] = True
                     return redirect(url_for("dashboard"))
+                
                 else:
                     return render_template_string(
                         config["LOGIN_HTML"]
-                        .replace("<p>Enter the password to access.</p>", "<p>Incorrect password. Please try again.</p>")
+                        .replace("<p>Enter password.</p>", "<p>Incorrect password.</p>")
                     )
+            
             return render_template_string(config["LOGIN_HTML"])
 
         @app.route("/logout")
@@ -116,22 +115,9 @@ class PetFeederServer:
 
         @app.route("/")
         def dashboard():
-            c = request.args.get("c")
-            if c in self.tempCodes:
-                session["temp"] = True
-                index = self.tempCodes.index(c)
-                self.tempCodes.pop(index)
-
             if not is_logged_in():
-                if is_temp():
-                    return render_template_string(config["DASHBOARD_HTML"].replace("#bottom {","#bottom { visibility: hidden;").replace('id="show1"','id="hide1"').replace('id="show2"','id="hide2"'))
-                
                 return redirect(url_for("login"))
             
-            url = session.get("code_url", False)
-            if url != False:
-                return render_template_string(config["DASHBOARD_HTML"].replace('id="show1"','id="hide1"').replace('id="hide2"','id="show2"').replace("*link*",url))
-
             return render_template_string(config["DASHBOARD_HTML"])
 
         @app.route("/video_feed")
@@ -148,9 +134,6 @@ class PetFeederServer:
             if not is_logged_in():
                 return redirect(url_for("login"))
             
-            if is_temp():
-                return redirect(url_for("dashboard"))
-
             c = request.args.get("c")
 
             if c == "feed":
@@ -163,14 +146,7 @@ class PetFeederServer:
             
             elif c == "logout":
                 return redirect(url_for("logout"))
-            
-            elif c == "link":
-                code = secrets.token_urlsafe(5)
-                self.tempCodes.append(code)
-                link = "https://rabbits.sebak.me.uk/?c=" + code
-                session["code_url"] = link
-                return redirect(url_for("dashboard"))
-            
+                        
             else:
                 abort(400, description="Unknown command")
 
@@ -180,24 +156,27 @@ class PetFeederServer:
     def run(self, host="0.0.0.0", port=8080):
         self.app.run(host=host, port=port, threaded=True)
 
-import RPi.GPIO as GPIO
-def feed(time_seconds):
-    def feed_thread(time_seconds):
-        IN1 = 23
+try:
+    import RPi.GPIO as GPIO
+    def feed(time_seconds):
+        def feed_thread(time_seconds):
+            IN1 = 23
 
-        GPIO.setmode(GPIO.BCM)
-        GPIO.setup(IN1, GPIO.OUT)
-        time.sleep(0.5)
-
-        try:
-            GPIO.output(IN1, GPIO.HIGH)
-            time.sleep(time_seconds)
-            GPIO.output(IN1, GPIO.LOW)
-
-        finally:
+            GPIO.setmode(GPIO.BCM)
+            GPIO.setup(IN1, GPIO.OUT)
             time.sleep(0.5)
-            GPIO.cleanup()
 
-    threading.Thread(target=feed_thread, args=(time_seconds,)).start()
+            try:
+                GPIO.output(IN1, GPIO.HIGH)
+                time.sleep(time_seconds)
+                GPIO.output(IN1, GPIO.LOW)
+
+            finally:
+                time.sleep(0.5)
+                GPIO.cleanup()
+
+        threading.Thread(target=feed_thread, args=(time_seconds)).start()
+except:
+    print("GPIO not found")
 
 def reboot(): subprocess.run(["sudo", "reboot"])
