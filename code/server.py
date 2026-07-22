@@ -147,16 +147,16 @@ class PetFeederServer:
                 return redirect(url_for("dashboard"))
             
             elif c == "reboot":
-                reboot()
+                threading.Thread(target=reboot, daemon=True).start()
                 return redirect(url_for("dashboard"))
 
             elif c == "restartApps":
-                restartApps()
+                threading.Thread(target=restartApps, daemon=True).start()
                 return redirect(url_for("dashboard"))
             
             elif c == "logout":
                 return redirect(url_for("logout"))
-                        
+
             else:
                 abort(400, description="Unknown command")
 
@@ -189,5 +189,5 @@ try:
 except:
     print("GPIO not found")
 
-def reboot(): subprocess.run(["sudo", "reboot"])
-def restartApps(): subprocess.run("sudo", "systemctl", "restart", "server.service")
+def reboot(): time.sleep(1); subprocess.run(["sudo", "reboot"])
+def restartApps(): time.sleep(1); subprocess.run("sudo", "systemctl", "restart", "server.service")
