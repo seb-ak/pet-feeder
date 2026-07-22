@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -81,6 +81,7 @@
 
 
         
+
         .side#list, .side#expand {
             position: relative;
             box-sizing: border-box;
@@ -96,7 +97,7 @@
             width: 1.5rem;
             height: 2rem;
 
-            opacity: 0.2;
+            opacity: 0.9;
             
             border-right: none;
             border-top-left-radius: 2rem;
@@ -107,7 +108,7 @@
         }
 
         .side#expand:hover {
-            opacity: 0.3;
+            opacity: 1;
         }
 
         #spinner {
@@ -148,7 +149,7 @@
             display: flex;
             flex-direction: column;
 
-            opacity: 0.2;
+            opacity: 0.9;
 
             width: calc(14rem);
             padding: 1rem;
@@ -159,23 +160,45 @@
 
         }
 
-        .side#list button {
+        .side#list form {
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .side#list button, .side#list input {
             color: white;
             background-color: transparent;
             width: 12rem;
-            border: 0.2rem whitesmoke solid;
+            border: 0.2rem rgba(245, 245, 245, 0.6) solid;
+
+            margin: 0;
+            padding: 0.2rem;
+
+            box-sizing: border-box;
         }
 
         .side#list button:hover {
             background-color: rgba(255, 255, 255, 0.3);
         }
 
-        .side#list button:first-child {
+        .side#list input:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .side#list input:focus {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 0.2rem rgba(245, 245, 245, 0.6) solid;
+            outline: transparent;
+        }
+
+        .side#list button:first-child, .side#list input:first-child {
             border-top-left-radius: 0.5rem;
             border-top-right-radius: 0.5rem;
         }
 
-        .side#list button:last-child {
+        .side#list button:last-child, .side#list input:last-child {
             border-bottom-left-radius: 0.5rem;
             border-bottom-right-radius: 0.5rem;
         }
@@ -193,6 +216,14 @@
         .side#list span {
             height: 2000vh;
         }
+
+        .side#list p {
+            font-size: 1rem;
+        }
+
+
+
+
 
         @keyframes loadSpin {
             0% {transform: translate(-50%, -50%) rotate(0deg);}
@@ -271,30 +302,39 @@
     }
 
     {
-        const video = document.querySelector("#video img");
         const loading = document.getElementById("loading");
-        let lastFrameTime = 0;
 
-        function frameRecieve() {
-            lastFrameTime = Date.now();
-            loading.style.visibility = "hidden"
+        function checkServer() {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 1500);
+
+            fetch("/ping", { signal: controller.signal })
+                .then((response) => {
+                    clearTimeout(timeoutId);
+                    if (response.ok) {
+                        loading.style.visibility = "hidden";
+                    } else {
+                        loading.style.visibility = "visible";
+                    }
+                })
+                .catch(() => {
+                    clearTimeout(timeoutId);
+                    loading.style.visibility = "visible";
+                });
         }
 
-        function frameError() {
-            loading.style.visibility = "visible"
-        }
-
-        function checkVideo() {
-            if (Date.now() - lastFrameTime > 1000) {
-                loading.style.visibility = "visible"
-            }
-        }
-
-        video.addEventListener("load", frameRecieve);
-        video.addEventListener("error", frameError);
-
-        setInterval(checkVideo, 1000);
+        setInterval(checkServer, 2000);
     }
 
+    function tryFullscreen() {
+        if (!document.fullscreenElement) {
+            document.body.requestFullscreen().catch(() => {});
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", tryFullscreen);
+    ["click", "keydown", "touchstart"].forEach(evt => {
+        document.addEventListener(evt, tryFullscreen, { once: true });
+    });
 </script>
 </html>

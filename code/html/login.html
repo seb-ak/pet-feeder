@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -96,7 +96,7 @@
             width: 1.5rem;
             height: 2rem;
 
-            opacity: 0.2;
+            opacity: 0.9;
             
             border-right: none;
             border-top-left-radius: 2rem;
@@ -107,7 +107,7 @@
         }
 
         .side#expand:hover {
-            opacity: 0.3;
+            opacity: 1;
         }
 
         #spinner {
@@ -148,7 +148,7 @@
             display: flex;
             flex-direction: column;
 
-            opacity: 0.2;
+            opacity: 0.9;
 
             width: calc(14rem);
             padding: 1rem;
@@ -159,23 +159,45 @@
 
         }
 
-        .side#list button, input {
+        .side#list form {
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .side#list button, .side#list input {
             color: white;
             background-color: transparent;
             width: 12rem;
-            border: 0.2rem whitesmoke solid;
+            border: 0.2rem rgba(245, 245, 245, 0.6) solid;
+
+            margin: 0;
+            padding: 0.2rem;
+
+            box-sizing: border-box;
         }
 
-        .side#list button, input:hover {
+        .side#list button:hover {
             background-color: rgba(255, 255, 255, 0.3);
         }
 
-        .side#list button, input:first-child {
+        .side#list input:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .side#list input:focus {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 0.2rem rgba(245, 245, 245, 0.6) solid;
+            outline: transparent;
+        }
+
+        .side#list button:first-child, .side#list input:first-child {
             border-top-left-radius: 0.5rem;
             border-top-right-radius: 0.5rem;
         }
 
-        .side#list button, input:last-child {
+        .side#list button:last-child, .side#list input:last-child {
             border-bottom-left-radius: 0.5rem;
             border-bottom-right-radius: 0.5rem;
         }
@@ -195,7 +217,7 @@
         }
 
         .side#list p {
-            font-size: 1.3rem;
+            font-size: 1rem;
         }
 
 
@@ -209,7 +231,7 @@
         #loading {
             position: absolute;
             bottom: 5vmin;
-            left: 5vmin;
+            left: 15vmin;
             transform: translate(-50%, -50%);
             width: 10vmin;
             height: 10vmin;
@@ -275,6 +297,16 @@
     toggleSide()
 
 
+    function tryFullscreen() {
+        if (!document.fullscreenElement) {
+            document.body.requestFullscreen().catch(() => {});
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", tryFullscreen);
+    ["click", "keydown", "touchstart"].forEach(evt => {
+        document.addEventListener(evt, tryFullscreen, { once: true });
+    });
 </script>
 </body>
 </html>

@@ -10,7 +10,6 @@ import os
 
 CONFIG = {
     "FEED_TIME_SECONDS": feedTimeSeconds,
-    "TITLE": title,
     "EXPECTED_PASSWORD": os.getenv("feeder_password", "password"),
     "FRAME_WIDTH": videoWidth,
     "FRAME_HEIGHT": videoHeight,

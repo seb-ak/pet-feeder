@@ -8,7 +8,7 @@ import datetime
 import logging
 import subprocess
 import secrets
-    
+
 class Camera:
     def __init__(self, config):
         self.config = config
@@ -122,12 +122,18 @@ class PetFeederServer:
 
         @app.route("/video_feed")
         def video_feed():
-            if not is_logged_in() and not is_temp():
+            if not is_logged_in():
                 abort(403)
             return Response(
                 stream_with_context(self.camera.generate_mjpeg()),
                 mimetype="multipart/x-mixed-replace; boundary=frame"
             )
+
+        @app.route("/ping")
+        def ping():
+            if not is_logged_in():
+                abort(403)
+            return jsonify({"status": "ok"})
         
         @app.route("/cmd")
         def cmd():
