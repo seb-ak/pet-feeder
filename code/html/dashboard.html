@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="code/icon.png" type="image/png">
-    <title>dashboard</title>
+    <title>Rabbits</title>
 
     <style>
         * {
@@ -15,6 +15,7 @@
         }
         body {
             background-color: black;
+            overflow: hidden;
         }
 
         #video {
@@ -72,7 +73,7 @@
                 width: auto;
                 height: min(100vw, calc(100vh * 9/16));
 
-                transform: translate(-50%, -50%) rotate(90deg);
+                transform: translate(-50%, -50%) rotate(-90deg);
                 transform-origin: center center;
             }
         }
@@ -80,9 +81,14 @@
 
 
 
+        .side#tabs {
+            display: flex;
+            /* flex-direction: column; */
+            flex-direction: column-reverse;
+        }
         
 
-        .side#list, .side#expand {
+        .side#list, .side.tab {
             position: relative;
             box-sizing: border-box;
             
@@ -90,12 +96,13 @@
             background-color: rgba(81, 85, 87, 0.6);
         }
 
-        .side#expand {
-
+        .side.tab {
             bottom: 0;
 
+            margin-top: 1rem;
+
             width: 1.5rem;
-            height: 2rem;
+            height: 4rem;
 
             opacity: 0.9;
             
@@ -107,11 +114,11 @@
             text-align: center;
         }
 
-        .side#expand:hover {
+        .side.tab:hover {
             opacity: 1;
         }
 
-        #spinner {
+        .spinner {
             font-weight: bolder;
             color: rgba(187, 209, 208, 0.5);
 
@@ -127,10 +134,10 @@
             
             position: fixed;
 
-            top: 5vh;
+            top: 10vh;
             left: calc(100vw - 1.5rem);
 
-            height: 90vh;
+            height: 80vh;
             display: flex;
 
             transition-duration: 0.4s;
@@ -140,7 +147,7 @@
         }
 
 
-        
+
 
         .side#list {
 
@@ -156,7 +163,8 @@
             gap: 0.25rem;
 
             border-right: none;
-            border-bottom-left-radius: 2rem;
+            /* border-bottom-left-radius: 2rem; */
+            border-top-left-radius: 2rem;
 
         }
 
@@ -171,7 +179,11 @@
             color: white;
             background-color: transparent;
             width: 12rem;
+            height: 2rem;
             border: 0.2rem rgba(245, 245, 245, 0.6) solid;
+
+            font-weight: 5rem;
+            font-size: 1.2rem;
 
             margin: 0;
             padding: 0.2rem;
@@ -194,7 +206,7 @@
         }
 
         .side#list button:first-child, .side#list input:first-child {
-            border-top-left-radius: 0.5rem;
+            border-top-left-radius: 1rem;
             border-top-right-radius: 0.5rem;
         }
 
@@ -209,7 +221,8 @@
             width: 12rem;
             border: 0.15rem whitesmoke solid;
             padding: 0;
-            margin: 0;
+            margin-top: 0.25rem;
+            margin-bottom: 0.25rem;
             box-sizing: border-box;
         }
 
@@ -223,8 +236,6 @@
 
 
 
-
-
         @keyframes loadSpin {
             0% {transform: translate(-50%, -50%) rotate(0deg);}
             100% {transform: translate(-50%, -50%) rotate(-360deg);}
@@ -232,8 +243,8 @@
 
         #loading {
             position: absolute;
-            top: 50vh;
-            left: 50vw;
+            bottom: 5vh;
+            left: 15vw;
             transform: translate(-50%, -50%);
             width: 10vmin;
             height: 10vmin;
@@ -241,6 +252,15 @@
             border-radius: 50%;
 
             animation: loadSpin 1s linear infinite;
+        }
+
+        #fixedUi {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            transition: all 0.1s ease-in;
         }
 
     </style>
@@ -257,49 +277,81 @@
     <div id="loading"></div>
 
 
-    <div class="side" id="container">
+    <div id="fixedUi">
+            
 
-        <div class="side" id="expand" onclick="toggleSide()">
-            <div id="spinner"><</div>
+        <div class="side" id="container">
+
+            <div class="side" id="tabs">
+
+                <div class="side tab" id="expand" onclick="toggleSide()">
+                    <div class="spinner" id="expandSpinner"><</div>
+                </div>
+                <div class="side tab" id="fullscreen" onclick="toggleFullscreen()">
+                    <div class="spinner" id="fullscreenSpinner">⇱</div>
+                </div>
+
+            </div>
+
+            <div class="side" id="list">
+
+                <!-- <button onclick="toggleFullscreen()">Fullscreen</button> -->
+                <button onclick="location.href='/cmd?c=feed'">Feed</button>
+                <hr>
+
+                <span></span>
+
+                <hr>
+                <button onclick="location.href='/cmd?c=logout'">Logout</button>
+                <hr>
+                <button onclick="location.href='/cmd?c=restartApps'">Restart Apps</button>
+                <button onclick="location.href='/cmd?c=reboot'">Reboot System</button>
+
+            </div>
+
         </div>
 
-        <div class="side" id="list">
-            <button onclick="toggleFullscreen()">Fullscreen</button>
-            <hr>
-            <button onclick="location.href='/cmd?c=feed'">Feed</button>
-
-            <span></span>
-
-            <button onclick="location.href='/cmd?c=logout'">Logout</button>
-            <button onclick="location.href='/cmd?c=reboot'">Reboot</button>
-        </div>
 
     </div>
-
-    
+        
 </body>
 <script>
-    function toggleFullscreen() {
-        if (document.fullscreenElement) {
-            document.exitFullscreen();
-        }
-        else {
-            document.body.requestFullscreen();
+
+    function moveFullscreenArrow() {
+        if (document.fullscreenElement == null) {
+            document.getElementById("fullscreenSpinner").style.rotate = "0deg";
+        } else {
+            document.getElementById("fullscreenSpinner").style.rotate = "-180deg";
         }
     }
+
+    document.addEventListener("fullscreenchange", moveFullscreenArrow);
+
+    async function toggleFullscreen() {
+        if (document.fullscreenElement) {
+            await document.exitFullscreen();
+        } else {
+            await document.body.requestFullscreen();
+        }
+        moveFullscreenArrow();
+    }
+
+    moveFullscreenArrow();
 
     let sideOpen = false;
     function toggleSide() {
         if (!sideOpen) {
-            document.getElementById("spinner").style.rotate = "-180deg"
-            document.getElementById("container").style.left = "calc(100vw - 1.5rem - 14rem)"
+            document.getElementById("expandSpinner").style.rotate = "-180deg";
+            document.getElementById("container").style.left = "calc(100vw - 1.5rem - 14rem)";
         } else {
-            
-            document.getElementById("spinner").style.rotate = "0deg"
-            document.getElementById("container").style.left = "calc(100vw - 1.5rem)"
+            document.getElementById("expandSpinner").style.rotate = "0deg";
+            document.getElementById("container").style.left = "calc(100vw - 1.5rem)";
         }
-        sideOpen = !sideOpen
+        sideOpen = !sideOpen;
     }
+
+
+
 
     {
         const loading = document.getElementById("loading");
@@ -324,6 +376,43 @@
         }
 
         setInterval(checkServer, 2000);
+    }
+
+    {
+        const el = document.getElementById('container');
+
+        function updateForZoom() {
+        const vv = window.visualViewport;
+        if (!vv) return;
+
+        const scale = vv.scale; // current pinch-zoom level
+            el.style.transformOrigin = 'top right';
+            el.style.transform = `scale(${1 / scale}) translate(${vv.offsetLeft}px, ${vv.offsetTop}px)`;
+        }
+
+        window.visualViewport?.addEventListener('resize', updateForZoom);
+        window.visualViewport?.addEventListener('scroll', updateForZoom);
+        updateForZoom();
+    }
+
+    {
+        const el = document.getElementById('fixedUi');
+
+        function updateForZoom() {
+            const vv = window.visualViewport;
+            if (!vv) return;
+
+            const scale = vv.scale; // current pinch-zoom level
+            el.style.transformOrigin = 'top left';
+            el.style.transform = `scale(${1 / scale})`;
+            
+            el.style.top = `${vv.offsetTop}px`
+            el.style.left = `${vv.offsetLeft}px`
+        }
+
+        window.visualViewport?.addEventListener('resize', updateForZoom);
+        window.visualViewport?.addEventListener('scroll', updateForZoom);
+        updateForZoom();
     }
 
 </script>

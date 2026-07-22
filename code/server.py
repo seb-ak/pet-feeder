@@ -149,6 +149,10 @@ class PetFeederServer:
             elif c == "reboot":
                 reboot()
                 return redirect(url_for("dashboard"))
+
+            elif c == "restartApps":
+                restartApps()
+                return redirect(url_for("dashboard"))
             
             elif c == "logout":
                 return redirect(url_for("logout"))
@@ -186,3 +190,4 @@ except:
     print("GPIO not found")
 
 def reboot(): subprocess.run(["sudo", "reboot"])
+def restartApps(): subprocess.run("sudo", "systemctl", "restart", "server.service")
