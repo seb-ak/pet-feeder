@@ -326,15 +326,5 @@
         setInterval(checkServer, 2000);
     }
 
-    function tryFullscreen() {
-        if (!document.fullscreenElement) {
-            document.body.requestFullscreen().catch(() => {});
-        }
-    }
-
-    document.addEventListener("DOMContentLoaded", tryFullscreen);
-    ["click", "keydown", "touchstart"].forEach(evt => {
-        document.addEventListener(evt, tryFullscreen, { once: true });
-    });
 </script>
 </html>
