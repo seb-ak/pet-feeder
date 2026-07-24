@@ -166,28 +166,27 @@ class PetFeederServer:
     def run(self, host="0.0.0.0", port=8080):
         self.app.run(host=host, port=port, threaded=True)
 
-try:
-    import RPi.GPIO as GPIO
-    def feed(time_seconds):
-        def feed_thread(time_seconds):
-            IN1 = 23
+import RPi.GPIO as GPIO
+def feed(time_seconds):
+    def feed_thread(time_seconds):
+        IN1 = 23
 
-            GPIO.setmode(GPIO.BCM)
-            GPIO.setup(IN1, GPIO.OUT)
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(IN1, GPIO.OUT)
+        time.sleep(0.5)
+
+        try:
+            print("feeding !!!!!!!")
+            GPIO.output(IN1, GPIO.HIGH)
+            time.sleep(time_seconds)
+            GPIO.output(IN1, GPIO.LOW)
+
+        finally:
             time.sleep(0.5)
+            GPIO.cleanup()
 
-            try:
-                GPIO.output(IN1, GPIO.HIGH)
-                time.sleep(time_seconds)
-                GPIO.output(IN1, GPIO.LOW)
+    threading.Thread(target=feed_thread, args=(time_seconds,)).start()
 
-            finally:
-                time.sleep(0.5)
-                GPIO.cleanup()
-
-        threading.Thread(target=feed_thread, args=(time_seconds)).start()
-except:
-    print("GPIO not found")
 
 def reboot(): time.sleep(1); subprocess.run(["sudo", "reboot"])
-def restartApps(): time.sleep(1); subprocess.run("sudo", "systemctl", "restart", "server.service")
+def restartApps(): time.sleep(1); subprocess.run(["sudo", "systemctl", "restart", "server.service"])

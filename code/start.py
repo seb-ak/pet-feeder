@@ -1,4 +1,4 @@
-feedTimeSeconds = 2
+feedTimeSeconds = 5
 frameRate = 15
 videoWidth = 1280 * 1
 videoHeight = 720 * 1
